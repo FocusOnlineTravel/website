@@ -5,3 +5,4 @@ Faust Documents: https://faustjs.org/docs/how-to/<br>
 Backend: Xneelo (TBC)<br>
 Frontend Dev: http://localhost:3000/<br>
 Frontend (Prod): Vercel (TBC)<br>
+Resource: https://github.com/wpengine/faust-scaffold/tree/main/
