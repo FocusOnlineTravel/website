@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.13.1",
+    "@faustwp/blocks": "^0.2.1",
     "@faustwp/cli": "^3.2.1",
     "@faustwp/core": "^3.2.1",
     "@tailwindcss/postcss": "^4.0.8",
