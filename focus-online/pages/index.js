@@ -1,22 +1,22 @@
 import { gql, useQuery } from '@apollo/client';
 
-const GET_HOME_PAGE = gql`
-  query GetHomePage {
-    page(id: "home", idType: URI) {
-      title
-    }
-  }
-`;
-
 export default function Home() {
-  const { data, loading, error } = useQuery(GET_HOME_PAGE);
+  const { data, loading, error } = useQuery(home_page);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div>
-      <h2>{data?.page?.title}</h2>
+      <h1>{data?.page?.title}</h1>
     </div>
   );
 }
+
+const home_page = gql`
+  query homePage {
+    page(id: "home", idType: URI) {
+      title
+    }
+  }
+`;
