@@ -1,10 +1,16 @@
-import { gql } from "@apollo/client";
+// import { gql } from "@apollo/client";
 import Link from "next/link";
 
 export default function Header() {
   return (
     <header>
-        Header section
+      <nav>
+        <ul className="flex">
+          <li><Link href="/">Home</Link></li>
+          <li><Link href="/about">About</Link></li>
+          <li><Link href="/contact">Contact</Link></li>
+        </ul>
+      </nav>
     </header>
   );
 }
