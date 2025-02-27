@@ -1,11 +1,32 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@apollo/client';
 import { gql } from '@apollo/client';
+import { gsap } from 'gsap';
 
 const GET_MENU_ITEMS = gql`
-  query GetFooterMenu {
-    menu(id: "footer-menu", idType: NAME) {
+  query GetFooterMenus {
+    primaryFooterMenu: menu(id: "footer-menu", idType: NAME) {
+      menuItems {
+        nodes {
+          id
+          path
+          label
+          url
+        }
+      }
+    }
+    secondaryFooterMenu: menu(id: "secondary-footer-menu", idType: NAME) {
+      menuItems {
+        nodes {
+          id
+          path
+          label
+          url
+        }
+      }
+    }
+    tertiaryFooterMenu: menu(id: "tertiary-footer-menu", idType: NAME) {
       menuItems {
         nodes {
           id
@@ -18,23 +39,58 @@ const GET_MENU_ITEMS = gql`
   }
 `;
 
-// You'll need to replace this with your actual social media links
-const socialLinks = [
-  { name: 'Facebook', url: 'https://facebook.com/youragency', icon: 'fab fa-facebook-f' },
-  { name: 'Twitter', url: 'https://twitter.com/youragency', icon: 'fab fa-twitter' },
-  { name: 'Instagram', url: 'https://instagram.com/youragency', icon: 'fab fa-instagram' },
-  { name: 'LinkedIn', url: 'https://linkedin.com/company/youragency', icon: 'fab fa-linkedin-in' }
-];
-
 export default function Footer() {
   const { loading, error, data } = useQuery(GET_MENU_ITEMS);
-  
+  const footerRef = useRef(null);
   const currentYear = new Date().getFullYear();
   
+  // GSAP animation setup
+  useEffect(() => {
+    if (footerRef.current) {
+      // Fade in the entire footer
+      gsap.from(footerRef.current, {
+        opacity: 0, 
+        y: 50, 
+        duration: 1,
+        ease: 'power3.out'
+      });
+      
+      // Stagger the menu items
+      gsap.from('.footer-menu-item', {
+        opacity: 0,
+        y: 20,
+        stagger: 0.1,
+        duration: 0.8,
+        delay: 0.5,
+        ease: 'back.out(1.7)'
+      });
+      
+      // Subtle hover effect for menu items
+      const menuItems = document.querySelectorAll('.footer-menu-item a');
+      menuItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+          gsap.to(item, {
+            color: '#90cdf4', // light blue color
+            duration: 0.3,
+            ease: 'power1.out'
+          });
+        });
+        
+        item.addEventListener('mouseleave', () => {
+          gsap.to(item, {
+            color: 'white',
+            duration: 0.3,
+            ease: 'power1.out'
+          });
+        });
+      });
+    }
+  }, [loading]); // Run after loading is complete
+  
   return (
-    <footer className="bg-black text-white py-10">
+    <footer ref={footerRef} className="bg-black text-white py-10">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
             <h3 className="text-xl font-bold mb-4">Your Agency Name</h3>
@@ -44,7 +100,7 @@ export default function Footer() {
             <p>Email: hello@youragency.com</p>
           </div>
           
-          {/* Menu Links */}
+          {/* Primary Menu Links */}
           <div>
             <h3 className="text-xl font-bold mb-4">Quick Links</h3>
             <nav>
@@ -54,8 +110,8 @@ export default function Footer() {
                 ) : error ? (
                   <li>Error loading menu</li>
                 ) : (
-                  data?.menu?.menuItems?.nodes?.map((item) => (
-                    <li key={item.id} className="mb-2">
+                  data?.primaryFooterMenu?.menuItems?.nodes?.map((item) => (
+                    <li key={item.id} className="mb-2 footer-menu-item">
                       <Link href={item.path || item.url} className="hover:text-gray-400 transition-colors">
                         {item.label}
                       </Link>
@@ -66,41 +122,48 @@ export default function Footer() {
             </nav>
           </div>
           
-          {/* Social Media */}
+          {/* Secondary Menu Links */}
           <div>
-            <h3 className="text-xl font-bold mb-4">Connect With Us</h3>
-            <div className="flex space-x-4">
-              {socialLinks.map((link) => (
-                <a 
-                  key={link.name}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition-colors"
-                  aria-label={link.name}
-                >
-                  <i className={link.icon}></i>
-                </a>
-              ))}
-            </div>
-            
-            <div className="mt-6">
-              <h4 className="text-lg font-semibold mb-2">Subscribe to our newsletter</h4>
-              <form className="flex flex-col sm:flex-row">
-                <input
-                  type="email"
-                  placeholder="Your email"
-                  className="px-4 py-2 bg-gray-800 text-white rounded-md mb-2 sm:mb-0 sm:mr-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Subscribe
-                </button>
-              </form>
-            </div>
+            <h3 className="text-xl font-bold mb-4">Resources</h3>
+            <nav>
+              <ul>
+                {loading ? (
+                  <li>Loading menu...</li>
+                ) : error ? (
+                  <li>Error loading menu</li>
+                ) : (
+                  data?.secondaryFooterMenu?.menuItems?.nodes?.map((item) => (
+                    <li key={item.id} className="mb-2 footer-menu-item">
+                      <Link href={item.path || item.url} className="hover:text-gray-400 transition-colors">
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </nav>
+          </div>
+          
+          {/* Third Menu Links */}
+          <div>
+            <h3 className="text-xl font-bold mb-4">Our Work</h3>
+            <nav>
+              <ul>
+                {loading ? (
+                  <li>Loading menu...</li>
+                ) : error ? (
+                  <li>Error loading menu</li>
+                ) : (
+                  data?.tertiaryFooterMenu?.menuItems?.nodes?.map((item) => (
+                    <li key={item.id} className="mb-2 footer-menu-item">
+                      <Link href={item.path || item.url} className="hover:text-gray-400 transition-colors">
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </nav>
           </div>
         </div>
         
