@@ -9,6 +9,7 @@ export default function Home() {
   return (
     <div>
       <h1>{data?.page?.title}</h1>
+      <div dangerouslySetInnerHTML={{ __html: data?.page?.content }} />
     </div>
   );
 }
@@ -17,6 +18,7 @@ const home_page = gql`
   query homePage {
     page(id: "home", idType: URI) {
       title
+      content
     }
   }
 `;
