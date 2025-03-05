@@ -4,7 +4,7 @@ export default function Layout({ children }) {
   return (
     <>
       <Head>
-        <title>TS Discography</title>
+        <title>Focus Online</title>
       </Head>
       <main>{children}</main>
     </>

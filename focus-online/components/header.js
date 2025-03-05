@@ -32,7 +32,7 @@ const Header = () => {
   const fallbackNavItems = [
     { id: '1', label: 'Home', path: '/' },
     { id: '2', label: 'About', path: '/about' },
-    { id: '3', label: 'Services', path: '/services' },
+    { id: '3', label: 'Clients', path: '/clients' },
     { id: '4', label: 'Blog', path: '/blog' },
     { id: '5', label: 'Contact', path: '/contact' },
   ];

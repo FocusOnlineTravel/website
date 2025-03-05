@@ -5,6 +5,7 @@ import "@faustwp/core/dist/css/toolbar.css";
 import '@/styles/globals.css';
 import Header from '../components/header';
 import Footer from '../components/footer';
+import Layout from '../components/layout';
  
 export default function App({ Component, pageProps }) {
 	const router = useRouter();
@@ -12,7 +13,9 @@ export default function App({ Component, pageProps }) {
 	return (
 		<FaustProvider pageProps={pageProps}>
 			<Header />
-			<Component {...pageProps} key={router.asPath} />
+			<Layout>
+				<Component {...pageProps} key={router.asPath} />
+			</Layout>
 			<Footer />
 		</FaustProvider>
 	);
