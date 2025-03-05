@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useQuery } from '@apollo/client';
 import { gql } from '@apollo/client';
 
-// GraphQL query to fetch navigation menu items
 const GET_NAVIGATION_MENU = gql`
   query GetNavigationMenu {
     menu(id: "header-menu", idType: NAME) {
@@ -32,12 +32,11 @@ const Header = () => {
   const fallbackNavItems = [
     { id: '1', label: 'Home', path: '/' },
     { id: '2', label: 'About', path: '/about' },
-    { id: '3', label: 'Clients', path: '/clients' },
     { id: '4', label: 'Blog', path: '/blog' },
-    { id: '5', label: 'Contact', path: '/contact' },
+    { id: '3', label: 'Clients', path: '/clients' },
+    
   ];
   
-  // Use data from query if available, otherwise use fallback
   const navItems = data?.menu?.menuItems?.nodes || fallbackNavItems;
 
   return (
@@ -47,10 +46,12 @@ const Header = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="block">
-              <img 
-                src="/images/logo.svg" 
+            <Image
+                src="https://backend.focusonlinetravel.co.za/wp-content/uploads/2025/03/logo.png" 
                 alt="Company Logo" 
                 className="h-10 w-auto" 
+                width={150}
+                height={100}
               />
             </Link>
           </div>
@@ -94,7 +95,6 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {isMenuOpen && (
           <nav className="md:hidden pt-4 pb-2">
             <div className="flex flex-col space-y-3">
