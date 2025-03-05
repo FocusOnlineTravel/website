@@ -34,7 +34,7 @@ export default function Clients() {
   return (
     <div className="container mx-auto px-4 py-8 text-center">
       <h1 className='text-3xl mt-4 mb-9 font-bold'>Our Clients</h1>
-      <div className='flex flex-wrap justify-center width-full'>
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
         {data.clients.nodes.map((client) => (
           <div className="mx-4" key={client.databaseId}>
             <Image className="aspect-[12/9] object-cover" src={client.clientFields?.clientImage.node.mediaItemUrl} width={400} height={200} alt={client.clientFields?.clientImage.node.altText} />

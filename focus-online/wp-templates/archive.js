@@ -19,7 +19,7 @@ const ArchivePage = () => {
   return (
     <div className='container mx-auto px-4 text-center'>
       <h1 className='text-3xl mt-4 mb-9 font-bold'>Blog Archive</h1>
-      <div className="posts-list">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {posts.length === 0 ? (
           <p>Loading posts...</p>
         ) : (
