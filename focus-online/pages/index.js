@@ -33,8 +33,8 @@ export default function HomePage({ siteData, heroVideo, clients, approach, testi
       </Head>
 
       {/* Hero Section */}
-      <section className="relative w-full h-screen">
-        <div className="absolute inset-0 z-0">
+      <section className="relative w-full h-[65vh]">
+        <div className="absolute inset-0 z-0 bg-black">
           <video
             autoPlay
             muted
@@ -43,46 +43,26 @@ export default function HomePage({ siteData, heroVideo, clients, approach, testi
             className="w-full h-full object-cover"
             onEnded={() => setIsPlaying(false)}
           >
-            <source src={heroVideo?.url || '/static/videos/hero-banner.mp4'} type="video/mp4" />
+            <source src={heroVideo?.url || 'https://streamable.com/l/89cjjq/mp4.mp4'} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
         </div>
         
         <div className="relative z-10 container mx-auto h-full flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-8">
-            Elevating Africa's Finest Properties Online
-          </h1>
-          <div>
-            <Link href="/contact" className="px-8 py-4 bg-amber-600 hover:bg-amber-700 text-white rounded-md font-medium transition-colors text-lg">
-              Discover How
-            </Link>
+          <div className="max-w-4xl mx-auto mt-12"> {/* Added container with max width */}
+            <h1 className="text-4xl md:text-5xl text-white mt-4 md:mt-12 italic"> {/* Added italic class */}
+              Elevating Safari Lodges & Boutique Hotels Across Africa Since 2012.
+            </h1>
           </div>
         </div>
+            
+
       </section>
 
       {/* Clients Section - Implemented without Swiper for SSR compatibility */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl text-center font-semibold text-gray-800 mb-12">
-            Working with 50+ luxury properties across Africa
-          </h2>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {clients.map((client, index) => (
-              <div key={index} className="h-24 flex items-center justify-center p-4">
-                <Image 
-                  src={client.logo.url || `/static/images/clients/${client.logo}`} 
-                  alt={client.name} 
-                  width={150} 
-                  height={80} 
-                  className="max-h-full w-auto object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
+      <ClientCarousel clients={clients} />
 
       {/* Introduction Section */}
       <section className="py-20 bg-white">
@@ -235,56 +215,10 @@ export default function HomePage({ siteData, heroVideo, clients, approach, testi
       </section>
 
       {/* Success Stories / Testimonials - Simple version without Swiper */}
-      <section className="py-24 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-3">Success Stories</h2>
-          </div>
-
-          <div className="max-w-5xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white p-8 md:p-12 rounded-lg shadow-md mb-8">
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="relative h-64 md:h-auto">
-                    <Image 
-                      src={testimonial.image.url || `/static/images/testimonials/${testimonial.image}`} 
-                      alt={testimonial.propertyName} 
-                      width={500}
-                      height={350}
-                      className="rounded-lg w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex flex-col justify-center">
-                    <div className="mb-4 flex">
-                      {[...Array(5)].map((_, i) => (
-                        <svg key={i} className="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                    <blockquote className="text-lg md:text-xl text-gray-700 mb-6">
-                      "{testimonial.quote}"
-                    </blockquote>
-                    <div>
-                      <p className="font-bold text-gray-900">{testimonial.author}</p>
-                      <p className="text-gray-600">{testimonial.position}, {testimonial.propertyName}</p>
-                    </div>
-                    {testimonial.results && (
-                      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                        <p className="font-semibold text-gray-800 mb-2">Results:</p>
-                        <p className="text-gray-700">{testimonial.results}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TestimonialCarousel testimonials={testimonials} />
 
       {/* Newsletter Signup */}
-      <section className="py-20 bg-amber-600">
+      <section className="py-20 bg-dune">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-white mb-4">Luxury Hospitality Insights</h2>
@@ -323,16 +257,23 @@ export async function getStaticProps() {
   };
   
   const heroVideo = {
-    url: "/static/videos/hero-banner.mp4",
+    url: "https://streamable.com/l/89cjjq/mp4.mp4",
   };
   
   const clients = [
-    { name: "Luxury Lodge 1", logo: "client1.png" },
-    { name: "Safari Experience", logo: "client2.png" },
-    { name: "Beach Resort", logo: "client3.png" },
-    { name: "Boutique Hotel", logo: "client4.png" },
-    { name: "Wine Estate", logo: "client5.png" },
-    { name: "Game Reserve", logo: "client6.png" },
+    { name: "Ilala Lodge", logo: "ilala-lodge.png" },
+    { name: "Kings Camp", logo: "kings-camp.png" },
+    { name: "Beach Resort", logo: "lmc.png" },
+    { name: "Boutique Hotel", logo: "melozhori.png" },
+    { name: "Wine Estate", logo: "seasons-in-africa.png" },
+    { name: "Game Reserve", logo: "turbine.png" },
+    { name: "Game Reserve", logo: "zqc.png" },
+    { name: "Wine Estate", logo: "scott.png" },
+    { name: "Game Reserve", logo: "gondwana.png" },
+    { name: "Game Reserve", logo: "penhill.png" },
+    { name: "Game Reserve", logo: "strandloper.png" },
+    { name: "Game Reserve", logo: "sirai.png" },
+    { name: "Game Reserve", logo: "palm.png" },
   ];
   
   const approach = [

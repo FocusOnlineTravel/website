@@ -88,16 +88,16 @@ export default function Footer() {
   }, [loading]); // Run after loading is complete
   
   return (
-    <footer ref={footerRef} className="bg-black text-white py-10">
+    <footer ref={footerRef} className="bg-storm-dark text-white py-10">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <h3 className="text-xl font-bold mb-4">Your Agency Name</h3>
+            <h3 className="text-xl font-bold mb-4">Focus Online Travel</h3>
             <p className="mb-2">123 Agency Street</p>
             <p className="mb-2">City, State 12345</p>
-            <p className="mb-2">Phone: (123) 456-7890</p>
-            <p>Email: hello@youragency.com</p>
+            <p className="mb-2">Phone: (021) 685-9784</p>
+            <p>Email: hello@focusonline.co.za</p>
           </div>
           
           {/* Primary Menu Links */}
@@ -171,7 +171,7 @@ export default function Footer() {
         
         {/* Copyright */}
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <p>&copy; {currentYear} Your Agency Name. All rights reserved.</p>
+          <p>&copy; {currentYear} Focus Online Travel. All rights reserved.</p>
           <div className="mt-4 md:mt-0">
             <Link href="/privacy-policy" className="hover:text-gray-400 transition-colors mr-4">
               Privacy Policy

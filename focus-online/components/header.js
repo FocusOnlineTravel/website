@@ -61,7 +61,7 @@ export default function Header() {
   }, [isMenuOpen]);
 
   return (
-    <header className="fixed w-full bg-black text-white z-50 shadow-sm">
+    <header className="fixed w-full bg-storm-dark text-white z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Left side - Core Nav Items (hidden on mobile) */}
@@ -96,8 +96,8 @@ export default function Header() {
               Agency
             </Link>
             <Link href="/contact">
-              <button className="hidden md:block bg-yellow-400 hover:bg-yellow-500 text-black px-5 py-2 rounded-md transition-colors">
-                Work with us
+              <button className="hidden md:block bg-golden hover:bg-golden-dark text-black px-5 py-2 rounded-md transition-colors">
+                Start your journey
               </button>
             </Link>
             <button 
