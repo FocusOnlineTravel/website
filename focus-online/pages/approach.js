@@ -1,13 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import Link from 'next/link';
 
-// Register GSAP plugins
+// Only import GSAP on the client side
+let gsap;
+let ScrollTrigger;
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
+  // Need to use dynamic imports for GSAP in Next.js
+  gsap = require('gsap');
+  ScrollTrigger = require('gsap/dist/ScrollTrigger');
+  
+  // Check if gsap has the registerPlugin method before calling it
+  if (gsap.registerPlugin) {
+    gsap.registerPlugin(ScrollTrigger);
+  } else if (gsap.default && gsap.default.registerPlugin) {
+    // Some bundlers export GSAP as a default export
+    gsap = gsap.default;
+    gsap.registerPlugin(ScrollTrigger);
+  }
 }
 
 export default function OurApproachPage() {
@@ -16,47 +27,111 @@ export default function OurApproachPage() {
   const toolsRef = useRef(null);
   const meetingsRef = useRef(null);
   
-  // GSAP animations
+  // GSAP animations - with improved error handling and cleanup
   useEffect(() => {
+    // Ensure we're on the client side and GSAP is available with registerPlugin
+    if (typeof window === 'undefined' || !gsap || !gsap.from) {
+      console.log("GSAP not properly loaded, skipping animations");
+      return;
+    }
+
+    // Store animations in an array to clean them up later
+    const animations = [];
+    const triggers = [];
+
     // Process steps animation
     const processSections = document.querySelectorAll('.process-step');
-    processSections.forEach((section, index) => {
-      gsap.from(section, {
+    if (processSections.length > 0) {
+      processSections.forEach((section, index) => {
+        if (section) {
+          const anim = gsap.from(section, {
+            opacity: 0,
+            y: 50,
+            duration: 0.8,
+            scrollTrigger: {
+              trigger: section,
+              start: "top 80%",
+              toggleActions: "play complete none none" // Changed from "play none none none"
+            },
+            delay: index * 0.2
+          });
+          animations.push(anim);
+          triggers.push(anim.scrollTrigger);
+        }
+      });
+    }
+
+    // Tools section animation
+    if (toolsRef.current) {
+      const toolsAnim = gsap.from(toolsRef.current, {
         opacity: 0,
         y: 50,
         duration: 0.8,
         scrollTrigger: {
-          trigger: section,
-          start: "top 80%",
-          toggleActions: "play none none none"
-        },
-        delay: index * 0.2
+          trigger: toolsRef.current,
+          start: "top 80%", 
+          toggleActions: "play complete none none" // Changed from "play none none none"
+        }
       });
-    });
-
-    // Tools section animation
-    gsap.from(toolsRef.current, {
-      opacity: 0,
-      y: 50,
-      duration: 0.8,
-      scrollTrigger: {
-        trigger: toolsRef.current,
-        start: "top 80%",
-        toggleActions: "play none none none"
-      }
-    });
+      animations.push(toolsAnim);
+      triggers.push(toolsAnim.scrollTrigger);
+    }
 
     // Meetings section animation
-    gsap.from(meetingsRef.current, {
-      opacity: 0,
-      y: 50,
-      duration: 0.8,
-      scrollTrigger: {
-        trigger: meetingsRef.current,
-        start: "top 80%",
-        toggleActions: "play none none none"
+    if (meetingsRef.current) {
+      const meetingsAnim = gsap.from(meetingsRef.current, {
+        opacity: 0,
+        y: 50,
+        duration: 0.8,
+        scrollTrigger: {
+          trigger: meetingsRef.current,
+          start: "top 80%",
+          toggleActions: "play complete none none" // Changed from "play none none none"
+        }
+      });
+      animations.push(meetingsAnim);
+      triggers.push(meetingsAnim.scrollTrigger);
+    }
+
+    // Add a fallback to ensure content is visible even if animations fail
+    const ensureContentVisible = () => {
+      document.querySelectorAll('.process-step').forEach(el => {
+        el.style.opacity = 1;
+        el.style.transform = 'none';
+      });
+      
+      if (toolsRef.current) {
+        toolsRef.current.style.opacity = 1;
+        toolsRef.current.style.transform = 'none';
       }
-    });
+      
+      if (meetingsRef.current) {
+        meetingsRef.current.style.opacity = 1;
+        meetingsRef.current.style.transform = 'none';
+      }
+    };
+
+    // Set a timeout to ensure content is visible after 2 seconds regardless of animation state
+    const visibilityTimeout = setTimeout(ensureContentVisible, 2000);
+
+    // Cleanup function for useEffect
+    return () => {
+      // Clear the fallback timeout
+      clearTimeout(visibilityTimeout);
+      
+      // Kill all ScrollTrigger instances
+      triggers.forEach(trigger => {
+        if (trigger) trigger.kill();
+      });
+      
+      // Kill all animations
+      animations.forEach(anim => {
+        if (anim) anim.kill();
+      });
+      
+      // Make sure all content is visible on unmount
+      ensureContentVisible();
+    };
   }, []);
 
   // Our approach process data
@@ -91,8 +166,8 @@ export default function OurApproachPage() {
   // Our project management tools data
   const projectTools = [
     {
-      name: "Asana",
-      description: "Central project management platform where we track all tasks, timelines, and deliverables. Clients receive access to their dedicated project board for complete transparency throughout our collaboration.",
+      name: "Basecamp",
+      description: "Central project management platform where we track all tasks, timelines, and deliverables. Clients receive access to their dedicated project space for complete transparency throughout our collaboration.",
       icon: "project-management.png"
     },
     {
@@ -144,9 +219,9 @@ export default function OurApproachPage() {
           </p>
           <div className="flex justify-center">
             <Link href="/contact">
-              <button className="px-8 py-4 bg-amber-600 hover:bg-amber-700 text-white rounded-md font-medium transition-colors text-lg">
+              <span className="px-8 py-4 bg-amber-600 hover:bg-amber-700 text-white rounded-md font-medium transition-colors text-lg inline-block cursor-pointer">
                 Start Your Journey
-              </button>
+              </span>
             </Link>
           </div>
         </div>
@@ -165,7 +240,7 @@ export default function OurApproachPage() {
           <div className="max-w-5xl mx-auto">
             <div className="space-y-16">
               {processSteps.map((step, index) => (
-                <div key={index} className="process-step flex flex-col md:flex-row items-start gap-6">
+                <div key={index} className="process-step flex flex-col md:flex-row items-start gap-6" style={{opacity: 1, transform: 'none'}}>
                   <div className="flex-shrink-0">
                     <div className="w-20 h-20 rounded-full bg-amber-600 flex items-center justify-center text-white text-3xl font-bold">
                       {index + 1}
@@ -183,7 +258,7 @@ export default function OurApproachPage() {
       </section>
 
       {/* Project Management Tools Section */}
-      <section ref={toolsRef} className="py-24 bg-white">
+      <section ref={toolsRef} className="py-24 bg-white" style={{opacity: 1, transform: 'none'}}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-3">Project Management</h2>
@@ -206,7 +281,7 @@ export default function OurApproachPage() {
       </section>
 
       {/* Meeting Structure Section */}
-      <section ref={meetingsRef} className="py-24 bg-gray-50">
+      <section ref={meetingsRef} className="py-24 bg-gray-50" style={{opacity: 1, transform: 'none'}}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-3">Collaboration Structure</h2>
@@ -241,113 +316,109 @@ export default function OurApproachPage() {
               </button>
             </div>
 
-            {/* Tab Content */}
+            {/* Tab Content - Added default display styles to ensure content is visible */}
             <div className="mt-8">
               {/* Website Development Tab */}
-              {activeTab === 0 && (
-                <div>
-                  <div className="bg-white p-8 rounded-lg shadow-md">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-6">Website Development Collaboration</h3>
+              <div style={{display: activeTab === 0 ? 'block' : 'none'}}>
+                <div className="bg-white p-8 rounded-lg shadow-md">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-6">Website Development Collaboration</h3>
+                  
+                  <div className="space-y-8">
+                    <div>
+                      <h4 className="text-xl font-semibold text-amber-700 mb-3">Project Kickoff</h4>
+                      <p className="text-gray-600 mb-4">
+                        An in-depth discovery session to align on goals, requirements, and creative direction. We'll establish project timelines, deliverables, and communication protocols.
+                      </p>
+                    </div>
                     
-                    <div className="space-y-8">
-                      <div>
-                        <h4 className="text-xl font-semibold text-amber-700 mb-3">Project Kickoff</h4>
-                        <p className="text-gray-600 mb-4">
-                          An in-depth discovery session to align on goals, requirements, and creative direction. We'll establish project timelines, deliverables, and communication protocols.
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-xl font-semibold text-amber-700 mb-3">Weekly Progress Meetings</h4>
-                        <p className="text-gray-600 mb-4">
-                          Regular check-ins throughout the design and development process to review progress, gather feedback, and ensure alignment with your vision and goals.
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-xl font-semibold text-amber-700 mb-3">Design Presentations</h4>
-                        <p className="text-gray-600 mb-4">
-                          Structured presentations of design concepts and iterations, allowing for collaborative feedback and refinement before moving to development.
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-xl font-semibold text-amber-700 mb-3">Development Milestones</h4>
-                        <p className="text-gray-600 mb-4">
-                          Regular reviews of key development milestones, providing opportunities to test functionality and ensure the technical implementation matches your expectations.
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-xl font-semibold text-amber-700 mb-3">Training & Handover</h4>
-                        <p className="text-gray-600 mb-4">
-                          Comprehensive training sessions on your new website's content management system, ensuring your team is equipped to maintain and update the site effectively.
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-xl font-semibold text-amber-700 mb-3">Post-Launch Review</h4>
-                        <p className="text-gray-600 mb-4">
-                          A thorough review of the launched website, addressing any final adjustments and establishing performance benchmarks for ongoing optimization.
-                        </p>
-                      </div>
+                    <div>
+                      <h4 className="text-xl font-semibold text-amber-700 mb-3">Weekly Progress Meetings</h4>
+                      <p className="text-gray-600 mb-4">
+                        Regular check-ins throughout the design and development process to review progress, gather feedback, and ensure alignment with your vision and goals.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-xl font-semibold text-amber-700 mb-3">Design Presentations</h4>
+                      <p className="text-gray-600 mb-4">
+                        Structured presentations of design concepts and iterations, allowing for collaborative feedback and refinement before moving to development.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-xl font-semibold text-amber-700 mb-3">Development Milestones</h4>
+                      <p className="text-gray-600 mb-4">
+                        Regular reviews of key development milestones, providing opportunities to test functionality and ensure the technical implementation matches your expectations.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-xl font-semibold text-amber-700 mb-3">Training & Handover</h4>
+                      <p className="text-gray-600 mb-4">
+                        Comprehensive training sessions on your new website's content management system, ensuring your team is equipped to maintain and update the site effectively.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-xl font-semibold text-amber-700 mb-3">Post-Launch Review</h4>
+                      <p className="text-gray-600 mb-4">
+                        A thorough review of the launched website, addressing any final adjustments and establishing performance benchmarks for ongoing optimization.
+                      </p>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
 
               {/* Ongoing Marketing Tab */}
-              {activeTab === 1 && (
-                <div>
-                  <div className="bg-white p-8 rounded-lg shadow-md">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-6">Ongoing Marketing Collaboration</h3>
+              <div style={{display: activeTab === 1 ? 'block' : 'none'}}>
+                <div className="bg-white p-8 rounded-lg shadow-md">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-6">Ongoing Marketing Collaboration</h3>
+                  
+                  <div className="space-y-8">
+                    <div>
+                      <h4 className="text-xl font-semibold text-amber-700 mb-3">Monthly Strategy Heartbeats</h4>
+                      <p className="text-gray-600 mb-4">
+                        Monthly strategic sessions to review performance metrics, discuss market trends, and align on priorities for the coming month. These meetings ensure your marketing efforts remain agile and responsive to changing conditions.
+                      </p>
+                    </div>
                     
-                    <div className="space-y-8">
-                      <div>
-                        <h4 className="text-xl font-semibold text-amber-700 mb-3">Monthly Strategy Heartbeats</h4>
-                        <p className="text-gray-600 mb-4">
-                          Monthly strategic sessions to review performance metrics, discuss market trends, and align on priorities for the coming month. These meetings ensure your marketing efforts remain agile and responsive to changing conditions.
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-xl font-semibold text-amber-700 mb-3">Quarterly Performance Reviews</h4>
-                        <p className="text-gray-600 mb-4">
-                          In-depth quarterly assessments of all marketing initiatives, analyzing performance against KPIs and identifying strategic opportunities for the upcoming quarter. These sessions often include recommendations for budget allocation and campaign refinements.
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-xl font-semibold text-amber-700 mb-3">Weekly Task Updates</h4>
-                        <p className="text-gray-600 mb-4">
-                          Regular updates through Asana on task progress, upcoming deliverables, and any action items requiring your input, ensuring continuous momentum and clear communication between meetings.
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-xl font-semibold text-amber-700 mb-3">Campaign Launch Briefings</h4>
-                        <p className="text-gray-600 mb-4">
-                          Dedicated sessions before each major campaign launch to review creative assets, targeting strategies, and expected outcomes, ensuring alignment before deployment.
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-xl font-semibold text-amber-700 mb-3">Annual Strategy Planning</h4>
-                        <p className="text-gray-600 mb-4">
-                          Comprehensive annual planning workshops to establish marketing objectives, budget allocation, and campaign calendar for the upcoming year, aligned with your property's business goals and market positioning.
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-xl font-semibold text-amber-700 mb-3">On-Demand Consultations</h4>
-                        <p className="text-gray-600 mb-4">
-                          Flexible access to our team for ad-hoc strategic consultations, emergency situations, or time-sensitive opportunities that arise between regular meetings.
-                        </p>
-                      </div>
+                    <div>
+                      <h4 className="text-xl font-semibold text-amber-700 mb-3">Quarterly Performance Reviews</h4>
+                      <p className="text-gray-600 mb-4">
+                        In-depth quarterly assessments of all marketing initiatives, analyzing performance against KPIs and identifying strategic opportunities for the upcoming quarter. These sessions often include recommendations for budget allocation and campaign refinements.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-xl font-semibold text-amber-700 mb-3">Weekly Task Updates</h4>
+                      <p className="text-gray-600 mb-4">
+                        Regular updates through Basecamp on task progress, upcoming deliverables, and any action items requiring your input, ensuring continuous momentum and clear communication between meetings.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-xl font-semibold text-amber-700 mb-3">Campaign Launch Briefings</h4>
+                      <p className="text-gray-600 mb-4">
+                        Dedicated sessions before each major campaign launch to review creative assets, targeting strategies, and expected outcomes, ensuring alignment before deployment.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-xl font-semibold text-amber-700 mb-3">Annual Strategy Planning</h4>
+                      <p className="text-gray-600 mb-4">
+                        Comprehensive annual planning workshops to establish marketing objectives, budget allocation, and campaign calendar for the upcoming year, aligned with your property's business goals and market positioning.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-xl font-semibold text-amber-700 mb-3">On-Demand Consultations</h4>
+                      <p className="text-gray-600 mb-4">
+                        Flexible access to our team for ad-hoc strategic consultations, emergency situations, or time-sensitive opportunities that arise between regular meetings.
+                      </p>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
@@ -362,9 +433,9 @@ export default function OurApproachPage() {
               Let's discuss how our approach can be tailored to your property's unique needs and goals.
             </p>
             <Link href="/contact">
-              <button className="px-8 py-4 bg-white hover:bg-gray-100 text-amber-600 rounded-md font-bold transition-colors text-lg shadow-md">
+              <span className="inline-block px-8 py-4 bg-white hover:bg-gray-100 text-amber-600 rounded-md font-bold transition-colors text-lg shadow-md cursor-pointer">
                 Schedule a Consultation
-              </button>
+              </span>
             </Link>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -330,37 +330,75 @@ export default function ServicesPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <h2 className="text-4xl font-bold text-gray-800 text-center mb-16">Frequently Asked Questions</h2>
-          
-          <div className="space-y-8">
-            {[
-              {
-                question: "How do I know which service option is right for my property?",
-                answer: "The best choice depends on your current digital presence, goals, and budget. If you primarily need a professional online presence without ongoing marketing, our Website Development services are ideal. If you're looking to actively grow direct bookings and reduce OTA dependency, our Ongoing Marketing options provide the strategic support needed. We're happy to discuss your specific situation during a free consultation call."
-              },
-              {
-                question: "How long will it take to see results from your services?",
-                answer: "While every property is unique, our clients typically begin seeing measurable improvements within 2-3 months. Initial quick wins often come from technical optimizations and website improvements, while sustainable growth builds over 6-12 months as we implement comprehensive strategies across channels."
-              },
-              {
-                question: "Do you require long-term contracts?",
-                answer: "For website development projects, we work on a project basis with clear milestones and deliverables. For ongoing marketing relationships, our standard agreements are 6-month commitments to ensure we have sufficient time to implement strategies and demonstrate results, but we don't lock you into multi-year contracts."
-              },
-              {
-                question: "What makes you different from other digital marketing agencies?",
-                answer: "Unlike general marketing agencies, we exclusively serve luxury African properties. This specialized focus gives us unparalleled insight into your unique challenges, target audience, and competitive landscape. Our team combines local market knowledge with international digital expertise to deliver results that generalist agencies simply cannot match."
-              }
-            ].map((faq, index) => (
-              <div key={index} className="bg-gray-50 rounded-lg p-8">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">{faq.question}</h3>
+      {/* FAQ Section */}
+<section className="py-24 bg-white">
+  <div className="container mx-auto px-4 max-w-5xl">
+    <h2 className="text-4xl font-bold text-gray-800 text-center mb-16">Frequently Asked Questions</h2>
+    
+    <div className="space-y-4">
+      {/* FAQ Accordion - uses React state to manage which item is open */}
+      {(() => {
+        const [openIndex, setOpenIndex] = useState(null);
+        
+        const toggleAccordion = (index) => {
+          setOpenIndex(openIndex === index ? null : index);
+        };
+        
+        const faqs = [
+          {
+            question: "How do I know which service option is right for my property?",
+            answer: "The best choice depends on your current digital presence, goals, and budget. If you primarily need a professional online presence without ongoing marketing, our Website Development services are ideal. If you're looking to actively grow direct bookings and reduce OTA dependency, our Ongoing Marketing options provide the strategic support needed. We're happy to discuss your specific situation during a free consultation call."
+          },
+          {
+            question: "How long will it take to see results from your services?",
+            answer: "While every property is unique, our clients typically begin seeing measurable improvements within 2-3 months. Initial quick wins often come from technical optimizations and website improvements, while sustainable growth builds over 6-12 months as we implement comprehensive strategies across channels."
+          },
+          {
+            question: "Do you require long-term contracts?",
+            answer: "For website development projects, we work on a project basis with clear milestones and deliverables. For ongoing marketing relationships, our standard agreements are 6-month commitments to ensure we have sufficient time to implement strategies and demonstrate results, but we don't lock you into multi-year contracts."
+          },
+          {
+            question: "What makes you different from other digital marketing agencies?",
+            answer: "Unlike general marketing agencies, we exclusively serve luxury African properties. This specialized focus gives us unparalleled insight into your unique challenges, target audience, and competitive landscape. Our team combines local market knowledge with international digital expertise to deliver results that generalist agencies simply cannot match."
+          }
+        ];
+        
+        return faqs.map((faq, index) => (
+          <div key={index} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            <button
+              className="flex justify-between items-center w-full px-8 py-5 text-left bg-white hover:bg-gray-50 focus:outline-none transition-colors"
+              onClick={() => toggleAccordion(index)}
+              aria-expanded={openIndex === index}
+              aria-controls={`faq-content-${index}`}
+            >
+              <span className="text-lg font-semibold text-gray-800">{faq.question}</span>
+              <svg
+                className={`w-5 h-5 text-amber-600 transform transition-transform duration-300 ${
+                  openIndex === index ? 'rotate-180' : ''
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div
+              id={`faq-content-${index}`}
+              className={`overflow-hidden transition-all duration-300 ${
+                openIndex === index ? 'max-h-96' : 'max-h-0'
+              }`}
+            >
+              <div className="p-8 bg-gray-50 border-t border-gray-200">
                 <p className="text-gray-700">{faq.answer}</p>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </section>
+        ));
+      })()}
+    </div>
+  </div>
+</section>
     </>
   );
 }
