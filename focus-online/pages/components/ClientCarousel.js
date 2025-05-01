@@ -15,51 +15,55 @@ const ClientCarousel = ({ clients }) => {
         WE WORK WITH LEADING AFRICAN TRAVEL BRANDS
       </h2>
       <div className="container mx-auto px-4">
-        <Swiper
-          modules={[Navigation, Pagination, Autoplay]}
-          spaceBetween={30}
-          slidesPerView={2}
-          loop={true}
-          autoplay={{
-            delay: 3000,
-            disableOnInteraction: false,
-          }}
-          speed={800} // Control speed of slide transition
-          navigation={false} // Add navigation arrows
-          breakpoints={{
-            640: {
-              slidesPerView: 3,
-              spaceBetween: 20,
-            },
-            768: {
-              slidesPerView: 4,
-              spaceBetween: 30,
-            },
-            1024: {
-              slidesPerView: 5,
-              spaceBetween: 30,
-            },
-            1280: {
-              slidesPerView: 6,
-              spaceBetween: 30,
-            },
-          }}
-          className="clients-carousel"
-        >
-          {clients.map((client, index) => (
-            <SwiperSlide key={index}>
-              <div className="h-48 flex items-center justify-center p-4">
-                <Image 
-                  src={client.logo.url || `/static/images/clients/${client.logo}`} 
-                  alt={client.name} 
-                  width={300} 
-                  height={160} 
-                  className="max-h-full w-auto object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
-                />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+      {clients && clients.length > 0 ? (
+  <Swiper
+    modules={[Navigation, Pagination, Autoplay]}
+    spaceBetween={30}
+    slidesPerView={2}
+    loop={true}
+    autoplay={{
+      delay: 3000,
+      disableOnInteraction: false,
+    }}
+    speed={800}
+    navigation={false}
+    breakpoints={{
+      640: {
+        slidesPerView: 3,
+        spaceBetween: 20,
+      },
+      768: {
+        slidesPerView: 4,
+        spaceBetween: 30,
+      },
+      1024: {
+        slidesPerView: 5,
+        spaceBetween: 30,
+      },
+      1280: {
+        slidesPerView: 6,
+        spaceBetween: 30,
+      },
+    }}
+    className="clients-carousel"
+  >
+    {clients.map((client, index) => (
+      <SwiperSlide key={index}>
+        <div className="h-48 flex items-center justify-center p-4">
+          <img 
+            src={client.logo?.url || `/static/images/clients/${client.logo}`} 
+            alt={client.name || 'Client logo'} 
+            className="max-h-full w-auto object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+          />
+        </div>
+      </SwiperSlide>
+    ))}
+  </Swiper>
+) : (
+  <div className="flex items-center justify-center py-12">
+    <p className="text-gray-600">No clients available</p>
+  </div>
+)}
       </div>
     </div>
   );
