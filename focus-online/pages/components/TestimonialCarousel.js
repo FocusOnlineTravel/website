@@ -15,7 +15,7 @@ const TestimonialsGrid = ({ testimonials }) => {
             <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full transition-transform duration-300 hover:shadow-xl hover:-translate-y-1">
               <div className="relative h-56">
                 <Image 
-                  src={testimonial.image.url || `/static/images/testimonials/${testimonial.image}`} 
+                  src={testimonial.image.url || '/static/images/testimonials/${testimonial.image}'} 
                   alt={testimonial.propertyName} 
                   layout="fill"
                   objectFit="cover"
