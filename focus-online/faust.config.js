@@ -9,5 +9,7 @@ export default setConfig({
 	experimentalToolbar: true,
 	templates,
 	plugins: [],
+	staticDirectories: ['static'],
 	possibleTypes,
 });
+
